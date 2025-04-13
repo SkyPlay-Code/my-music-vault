@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Project Sanctuary - Private Vault</title>
+    <meta name="description" content="A private digital vault for personal audio collection.">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/songs.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/player.js" defer></script>
+</head>
+<body>
+
+    <div id="password-gate">
+        <div class="gate-content">
+            <h2>Enter Access Code</h2>
+            <input type="password" id="password-input" placeholder="Password">
+            <button id="submit-password">Enter</button>
+            <p id="error-message" class="error"></p>
+        </div>
+    </div>
+
+    <div id="main-content" style="display: none;">
+
+        <header>
+            <h1>My Sanctuary</h1>
+            <p>Private Song Collection</p>
+        </header>
+
+        <main>
+            <section id="song-library">
+                <h2>Library</h2>
+                <ul id="song-list">
+                    </ul>
+            </section>
+
+            <section id="audio-player">
+                <h2>Now Playing</h2>
+                <div id="player-controls">
+                    <audio id="audio-element"></audio> <div id="track-info">
+                        <span id="current-track-title">No track selected</span>
+                    </div>
+                    <div class="controls">
+                        <button id="play-pause-button" aria-label="Play/Pause">▶️</button>
+                        <span id="current-time">0:00</span>
+                        <input type="range" id="progress-bar" value="0" step="0.1" aria-label="Playback progress">
+                        <span id="duration">0:00</span>
+                        <input type="range" id="volume-control" min="0" max="1" step="0.05" value="1" aria-label="Volume control">
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; SkyMusic - All Rights Reserved</p>
+        </footer>
+
+    </div> </body>
+</html>
