@@ -1,26 +1,32 @@
 // --- js/player.js ---
+// Refactored to control the new, beautiful player UI.
 
-// Wait until the basic HTML structure is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Only run player logic if the main content is potentially visible
-    // (This check might be redundant if auth.js handles display correctly, but safe)
-    const mainContent = document.getElementById('main-content');
-    if (!mainContent) return; // Exit if main content area doesn't exist
+    const appContainer = document.getElementById('app-container');
+    if (!appContainer) return;
 
-    // --- Player Element References ---
+    // --- Player Element References (for the new design) ---
     const audioElement = document.getElementById('audio-element');
     const songListElement = document.getElementById('song-list');
+    
     const playPauseButton = document.getElementById('play-pause-button');
+    const playPauseIcon = playPauseButton.querySelector('i');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+
+    const albumArt = document.getElementById('album-art');
+    const albumArtShadow = document.querySelector('.album-art-shadow');
+    const trackTitleDisplay = document.getElementById('current-track-title');
+    const trackArtistDisplay = document.getElementById('current-track-artist');
+
     const progressBar = document.getElementById('progress-bar');
-    const volumeControl = document.getElementById('volume-control');
     const currentTimeDisplay = document.getElementById('current-time');
     const durationDisplay = document.getElementById('duration');
-    const currentTrackTitleDisplay = document.getElementById('current-track-title');
+    const volumeControl = document.getElementById('volume-control');
 
-    let currentTrackIndex = -1; // Index of the currently loaded/playing track, -1 means none
-    let isPlaying = false;
+    let currentTrackIndex = -1;
 
-    // --- Helper Functions ---
+    // --- Helper Function ---
     function formatTime(seconds) {
         const minutes = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
@@ -29,29 +35,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Load Song List ---
     function populateSongList() {
-        songListElement.innerHTML = ''; // Clear existing list items
+        songListElement.innerHTML = '';
         songDatabase.forEach((song, index) => {
             const listItem = document.createElement('li');
-            listItem.dataset.index = index; // Store the index on the element
-
-            const titleSpan = document.createElement('span');
-            titleSpan.className = 'song-title';
-            titleSpan.textContent = `${song.title} - ${song.artist}`;
-
-            const downloadLink = document.createElement('a');
-            downloadLink.href = song.file;
-            downloadLink.textContent = 'Download';
-            downloadLink.className = 'download-button';
-            downloadLink.setAttribute('download', ''); // HTML5 attribute to trigger download
-            // Prevent click on download link from triggering song play
-            downloadLink.addEventListener('click', (e) => {
+            listItem.dataset.index = index;
+            listItem.innerHTML = `
+                <div>
+                    <div class="song-title">${song.title}</div>
+                    <div class="song-artist">${song.artist}</div>
+                </div>
+                <a href="${song.file}" class="download-button" download>
+                    <i class="fas fa-download"></i>
+                </a>
+            `;
+            
+            listItem.querySelector('.download-button').addEventListener('click', (e) => {
                 e.stopPropagation();
             });
-
-
-            listItem.appendChild(titleSpan);
-            listItem.appendChild(downloadLink);
-
 
             listItem.addEventListener('click', () => {
                 loadTrack(index);
@@ -64,152 +64,137 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Track Management ---
     function loadTrack(index) {
-        if (index < 0 || index >= songDatabase.length) return; // Index out of bounds
+        if (index < 0 || index >= songDatabase.length) return;
 
-        // Remove 'active' class from previously active item
-        const activeListItem = songListElement.querySelector('li.active');
+        const activeListItem = songListElement.querySelector('li.active-song');
         if (activeListItem) {
-            activeListItem.classList.remove('active');
+            activeListItem.classList.remove('active-song');
+        }
+        const newActiveListItem = songListElement.querySelector(`li[data-index="${index}"]`);
+        if (newActiveListItem) {
+            newActiveListItem.classList.add('active-song');
         }
 
         currentTrackIndex = index;
         const track = songDatabase[currentTrackIndex];
+
         audioElement.src = track.file;
-        currentTrackTitleDisplay.textContent = `${track.title} - ${track.artist}`;
-
-        // Add 'active' class to the new list item
-         const newActiveListItem = songListElement.querySelector(`li[data-index="${index}"]`);
-        if (newActiveListItem) {
-             newActiveListItem.classList.add('active');
-        }
-
-
-        // Reset displays until metadata loads
-        currentTimeDisplay.textContent = '0:00';
-        durationDisplay.textContent = '0:00';
+        trackTitleDisplay.textContent = track.title;
+        trackArtistDisplay.textContent = track.artist;
+        albumArt.src = track.cover;
+        albumArtShadow.style.backgroundImage = `url('${track.cover}')`;
+        
         progressBar.value = 0;
-        // Don't auto-play here, let playTrack handle it
+        currentTimeDisplay.textContent = '0:00';
     }
 
     function playTrack() {
-        if (currentTrackIndex === -1) { // No track loaded
-            if (songDatabase.length > 0) {
-                loadTrack(0); // Load the first track if none selected
-            } else {
-                console.warn("No songs in the database to play.");
-                return; // No songs to play
-            }
+        if (currentTrackIndex === -1 && songDatabase.length > 0) {
+            loadTrack(0); // Load first song if none is loaded
         }
-        audioElement.play()
-            .then(() => {
-                isPlaying = true;
-                playPauseButton.textContent = '⏸️'; // Pause symbol
-            })
-            .catch(error => {
-                console.error("Playback failed:", error);
-                // Handle potential errors (e.g., browser restrictions on autoplay)
-                isPlaying = false;
-                 playPauseButton.textContent = '▶️'; // Play symbol
-            });
+        audioElement.play().catch(error => console.error("Playback failed:", error));
     }
 
     function pauseTrack() {
         audioElement.pause();
-        isPlaying = false;
-        playPauseButton.textContent = '▶️'; // Play symbol
     }
-
+    
     function togglePlayPause() {
-        if (isPlaying) {
-            pauseTrack();
-        } else {
+        if (audioElement.paused || audioElement.ended) {
             playTrack();
+        } else {
+            pauseTrack();
         }
     }
 
-    // --- Update UI based on Audio State ---
+    function prevTrack() {
+        currentTrackIndex = (currentTrackIndex - 1 + songDatabase.length) % songDatabase.length;
+        loadTrack(currentTrackIndex);
+        playTrack();
+    }
+    
+    function nextTrack() {
+        currentTrackIndex = (currentTrackIndex + 1) % songDatabase.length;
+        loadTrack(currentTrackIndex);
+        playTrack();
+    }
+
+    // --- UI Updates based on Audio State ---
     function updateProgress() {
-        if (!isNaN(audioElement.duration)) {
-            const progress = (audioElement.currentTime / audioElement.duration) * 100;
-            progressBar.value = progress;
-            currentTimeDisplay.textContent = formatTime(audioElement.currentTime);
-        }
+        if (isNaN(audioElement.duration)) return;
+        progressBar.value = (audioElement.currentTime / audioElement.duration) * 100;
+        currentTimeDisplay.textContent = formatTime(audioElement.currentTime);
     }
 
     function updateDuration() {
-         if (!isNaN(audioElement.duration)) {
-            durationDisplay.textContent = formatTime(audioElement.duration);
-         } else {
-             // Duration might not be available immediately
-             durationDisplay.textContent = '--:--';
-         }
+        durationDisplay.textContent = isNaN(audioElement.duration) ? '0:00' : formatTime(audioElement.duration);
     }
 
     // --- Event Listeners for Audio Element ---
-    audioElement.addEventListener('loadedmetadata', updateDuration); // When duration is known
-    audioElement.addEventListener('timeupdate', updateProgress); // As playback time changes
+    audioElement.addEventListener('loadedmetadata', updateDuration);
+    audioElement.addEventListener('timeupdate', updateProgress);
+    audioElement.addEventListener('ended', nextTrack);
+
     audioElement.addEventListener('play', () => {
-        isPlaying = true;
-        playPauseButton.textContent = '⏸️';
+        playPauseIcon.classList.remove('fa-play');
+        playPauseIcon.classList.add('fa-pause');
     });
+
     audioElement.addEventListener('pause', () => {
-        isPlaying = false;
-        playPauseButton.textContent = '▶️';
+        playPauseIcon.classList.add('fa-play');
+        playPauseIcon.classList.remove('fa-pause');
     });
-     audioElement.addEventListener('ended', () => {
-         // Optional: Implement play next track automatically
-         // let nextIndex = (currentTrackIndex + 1) % songDatabase.length;
-         // loadTrack(nextIndex);
-         // playTrack();
-         isPlaying = false;
-         playPauseButton.textContent = '▶️';
-         progressBar.value = 0; // Reset progress bar
-         currentTimeDisplay.textContent = '0:00';
-     });
 
 
     // --- Event Listeners for Controls ---
     playPauseButton.addEventListener('click', togglePlayPause);
+    prevButton.addEventListener('click', prevTrack);
+    nextButton.addEventListener('click', nextTrack);
 
     progressBar.addEventListener('input', () => {
         if (!isNaN(audioElement.duration)) {
-            const seekTime = (progressBar.value / 100) * audioElement.duration;
-            audioElement.currentTime = seekTime;
+            audioElement.currentTime = (progressBar.value / 100) * audioElement.duration;
         }
     });
 
-    volumeControl.addEventListener('input', () => {
-        audioElement.volume = volumeControl.value;
+    volumeControl.addEventListener('input', (e) => {
+        audioElement.volume = e.target.value;
     });
 
-    // --- Initial Setup ---
-    // Only populate list and setup player *after* successful authentication.
-    // We need to observe when the main content becomes visible.
-    const observer = new MutationObserver((mutationsList, obs) => {
-        for (const mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                if (mainContent.style.display !== 'none') {
-                    console.log("Main content visible, initializing player...");
-                    populateSongList();
-                    // Set initial volume based on slider default value
-                    audioElement.volume = volumeControl.value;
-                    // Load the first track info but don't play automatically
-                    if(songDatabase.length > 0) {
-                         loadTrack(0);
-                         // Ensure duration is updated once metadata is loaded for the first track
-                         audioElement.load(); // Important to trigger metadata loading without playing
-                    } else {
-                         currentTrackTitleDisplay.textContent = "No tracks in library.";
-                    }
+    // --- Main Initialization Logic (THE FIX IS HERE) ---
+    
+    /**
+     * This function contains all the logic to set up the player UI.
+     * It's called once the app container is known to be visible.
+     */
+    function initializePlayer() {
+        console.log("App container visible, initializing player...");
+        populateSongList();
+        audioElement.volume = volumeControl.value; // Set initial volume
+        
+        if (songDatabase.length > 0) {
+            loadTrack(0);
+            audioElement.load(); // Load metadata for the first track
+        } else {
+            trackTitleDisplay.textContent = "No tracks in library.";
+        }
+    }
 
-                    obs.disconnect(); // Stop observing once initialized
+    // Check if the app is already visible on page load (e.g., from a refresh with session storage).
+    if (appContainer.classList.contains('visible')) {
+        initializePlayer();
+    } else {
+        // If not visible, set up the observer to wait for the password unlock to make it visible.
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.attributeName === 'class' && appContainer.classList.contains('visible')) {
+                    initializePlayer();
+                    observer.disconnect(); // We only need to do this once.
                     return;
                 }
             }
-        }
-    });
-
-    // Start observing the main content for style changes (specifically display)
-    observer.observe(mainContent, { attributes: true });
+        });
+        observer.observe(appContainer, { attributes: true });
+    }
 
 }); // End DOMContentLoaded

@@ -1,288 +1,448 @@
-/* === CSS Variables (Customize Your Palette Here) === */
 :root {
-  --background-color: #1a1a1a; /* Dark background */
-  --text-color: #e0e0e0; /* Light grey text */
-  --primary-color: #4a90e2; /* A calming blue accent */
-  --secondary-color: #333; /* Darker grey for elements */
-  --border-color: #444; /* Subtle borders */
-  --error-color: #e74c3c; /* For error messages */
-  --font-main: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Clean sans-serif */
-  --font-heading: "Georgia", serif; /* Optional: A slightly different font for headings */
+    --bg-dark: #121212;
+    --primary-glass: rgba(24, 24, 24, 0.6);
+    --secondary-glass: rgba(40, 40, 40, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent-color: #6a5acd; /* Slate Blue */
+    --accent-hover: #7b68ee; /* Medium Slate Blue */
+    --font-family: 'Poppins', sans-serif;
 }
 
-/* === Global Resets & Base Styles === */
+/* ===== BASE STYLES & BACKGROUND ===== */
+
 * {
-  box-sizing: border-box; /* Makes layout calculations easier */
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: var(--font-main);
-  background-color: var(--background-color);
-  color: var(--text-color);
-  line-height: 1.6;
-  display: flex; /* Helps center the gate initially */
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; /* Ensure body takes full viewport height */
-  overflow-x: hidden; /* Prevent horizontal scroll */
+    font-family: var(--font-family);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    overflow: hidden; /* Hide scrollbars on the body */
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-heading); /* Use heading font if defined */
-  margin-bottom: 0.8em;
-  color: var(--primary-color); /* Accent color for headings */
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(135deg, #2a004f, #1e0d3d, #3c1e5c, var(--bg-dark));
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
 }
 
-button {
-  cursor: pointer;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  background-color: var(--primary-color);
-  color: #fff;
-  font-size: 1em;
-  transition: background-color 0.3s ease; /* Smooth hover effect */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
-button:hover {
-  background-color: #3a7bc8; /* Slightly darker blue on hover */
+/* ===== PASSWORD GATE ===== */
+
+#login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-input[type="password"],
-input[type="range"] {
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  background-color: var(--secondary-color);
-  color: var(--text-color);
-  border-radius: 5px;
-  font-size: 1em;
+#login-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
 }
 
-input[type="range"] {
-  cursor: pointer;
+.login-box {
+    background: var(--primary-glass);
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    text-align: center;
+    width: 90%;
+    max-width: 350px;
 }
 
-/* === Password Gate Styling === */
-#password-gate {
-  /* Centered by body flex */
-  width: 90%;
-  max-width: 400px;
-  padding: 30px;
-  background-color: var(--secondary-color);
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
+.login-box h1 {
+    font-weight: 600;
+    margin-bottom: 5px;
+    letter-spacing: 2px;
 }
 
-#password-gate .gate-content {
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Spacing between elements */
+.login-box p {
+    color: var(--text-secondary);
+    margin-bottom: 25px;
 }
 
-#password-gate h2 {
-  color: var(--text-color); /* Less emphasis than primary */
-  margin-bottom: 20px;
+#password-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--secondary-glass);
+    color: var(--text-primary);
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+#password-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#submit-password {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#submit-password:hover {
+    background: var(--accent-hover);
 }
 
 .error {
-  color: var(--error-color);
-  font-size: 0.9em;
-  min-height: 1.2em; /* Prevent layout shift when message appears */
+    color: #ff6b6b;
+    margin-top: 15px;
+    height: 1em;
 }
 
-/* === Main Content Styling === */
-#main-content {
-  width: 100%;
-  max-width: 900px; /* Control maximum width on large screens */
-  margin: 30px auto; /* Center content after auth */
-  padding: 20px;
-  display: flex; /* Using Flexbox for layout */
-  flex-direction: column;
-  gap: 40px; /* Space between header, main, footer */
+
+/* ===== MAIN APP LAYOUT ===== */
+
+#app-container {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }
 
-header,
-footer {
-  text-align: center;
-  padding: 15px;
-  border-bottom: 1px solid var(--border-color);
-}
-header {
-  border-bottom: 1px solid var(--border-color);
-  border-top: none;
-}
-footer {
-  border-top: 1px solid var(--border-color);
-  margin-top: 30px;
-  font-size: 0.9em;
-  color: #aaa;
+#app-container.visible {
+    opacity: 1;
 }
 
-main {
-  display: flex;
-  flex-direction: column; /* Stack library and player */
-  gap: 30px;
+/* Glass Panel Base Style */
+#playlist-panel, #player-panel {
+    background: var(--primary-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
 }
 
-/* === Song Library Styling === */
-#song-library ul {
-  list-style: none;
+
+/* ===== PLAYLIST PANEL (LEFT) ===== */
+
+#playlist-panel {
+    overflow: hidden;
 }
 
-#song-library li {
-  padding: 15px 10px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+.playlist-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
 }
 
-#song-library li:hover {
-  background-color: rgba(74, 144, 226, 0.1); /* Subtle hover highlight */
+.playlist-header h2 {
+    font-weight: 600;
 }
 
-#song-library li.active {
-  background-color: rgba(74, 144, 226, 0.2); /* Highlight currently playing */
-  font-weight: bold;
+.playlist-header p {
+    color: var(--text-secondary);
+    font-size: 0.9em;
 }
 
-.song-title {
-  flex-grow: 1; /* Allow title to take up available space */
-  margin-right: 15px;
+#song-list {
+    list-style: none;
+    overflow-y: auto;
+    flex-grow: 1; /* Makes the list take up available space */
+}
+
+/* Custom Scrollbar for song list */
+#song-list::-webkit-scrollbar {
+    width: 8px;
+}
+#song-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+#song-list::-webkit-scrollbar-thumb {
+    background-color: var(--secondary-glass);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+#song-list li {
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+#song-list li:hover {
+    background: var(--secondary-glass);
+}
+
+#song-list li .song-title {
+    font-weight: 500;
+}
+#song-list li .song-artist {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+
+#song-list li.active-song {
+    background-color: var(--accent-color);
+    color: white;
+}
+#song-list li.active-song .song-artist {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ===== PLAYER PANEL (RIGHT) ===== */
+#player-panel {
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.album-art-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+}
+#album-art {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    object-fit: cover;
+}
+.album-art-shadow {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: inherit; /* Should be set by JS */
+    filter: blur(20px) opacity(0.6);
+    transform: scale(0.9);
+    z-index: -1;
+    border-radius: 15px;
+}
+
+.track-info {
+    text-align: center;
+}
+#current-track-title {
+    font-size: 1.8em;
+    font-weight: 600;
+}
+#current-track-artist {
+    font-size: 1.1em;
+    color: var(--text-secondary);
+}
+
+.timeline-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.time-stamps {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.control-btn:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.control-btn.play {
+    background: var(--accent-color);
+    color: white;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    font-size: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: background-color 0.2s, transform 0.2s;
+}
+.control-btn.play:hover {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+}
+.control-btn.play i.fa-pause {
+    margin-left: -2px; /* Small visual alignment correction */
+}
+
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
+    color: var(--text-secondary);
+}
+
+
+/* ===== CUSTOM SLIDER STYLES ===== */
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--secondary-glass);
+    outline: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.slider:hover::-webkit-slider-thumb {
+    background: var(--accent-color);
+}
+.slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s ease;
+}
+.slider:hover::-moz-range-thumb {
+    background: var(--accent-color);
+}
+
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 850px) {
+    #app-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 40% 60%;
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    #player-panel {
+        justify-content: flex-start;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .album-art-container {
+        max-width: 180px;
+        margin-top: 10px;
+    }
+
+    #current-track-title { font-size: 1.5em; }
+    #current-track-artist { font-size: 1em; }
+
+    .control-btn.play { width: 60px; height: 60px; font-size: 1.6em; }
+}
+
+@media (max-width: 480px) {
+     #app-container {
+        grid-template-rows: 45% 55%;
+     }
+
+    #playlist-panel, #player-panel {
+        padding: 15px;
+    }
+
+    .login-box {
+        padding: 30px;
+    }
+
+    .track-info {
+        margin: 5px 0;
+    }
+
+    .timeline-container, .player-controls, .volume-container {
+        margin: 5px 0;
+    }
+
+    #current-track-title { font-size: 1.3em; }
+    #current-track-artist { font-size: 0.9em; }
+
+    .album-art-container { max-width: 150px; }
 }
 
 .download-button {
-  padding: 5px 10px;
-  font-size: 0.8em;
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
-  text-decoration: none;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  transition: all 0.3s ease;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    padding: 5px;
+    margin-right: -5px; /* Visual alignment */
+    transition: color 0.2s ease;
 }
 
 .download-button:hover {
-  background-color: var(--primary-color);
-  color: #fff;
+    color: var(--text-primary);
 }
 
-/* === Audio Player Styling === */
-#audio-player {
-  background-color: var(--secondary-color);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+#song-list li.active-song .download-button {
+    color: rgba(255, 255, 255, 0.8);
 }
-
-#player-controls .controls {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Spacing between controls */
-  margin-top: 15px;
-  flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
-}
-
-#play-pause-button {
-  font-size: 1.5em; /* Make play/pause prominent */
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  padding: 0 5px;
-}
-
-#track-info {
-  font-style: italic;
-  color: #ccc;
-  margin-bottom: 10px;
-  min-height: 1.2em; /* Prevent layout shifts */
-}
-
-#progress-bar {
-  flex-grow: 1; /* Make progress bar fill available space */
-  height: 8px; /* Thinner progress bar */
-  appearance: none; /* Override default look */
-  background: #555;
-  border-radius: 5px;
-  overflow: hidden; /* Ensure progress fill stays within bounds */
-}
-/* Style the progress thumb */
-#progress-bar::-webkit-slider-thumb {
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  cursor: pointer;
-}
-#progress-bar::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-/* Style the volume slider */
-#volume-control {
-  width: 100px; /* Fixed width for volume */
-  height: 6px;
-  appearance: none;
-  background: #555;
-  border-radius: 5px;
-  overflow: hidden;
-}
-#volume-control::-webkit-slider-thumb {
-  appearance: none;
-  width: 10px;
-  height: 10px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  cursor: pointer;
-}
-#volume-control::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-/* === Responsiveness (Mobile First Approach) === */
-
-/* Styles above are mobile-first friendly. Add adjustments for larger screens */
-
-@media (min-width: 600px) {
-  #main-content {
-    padding: 40px;
-  }
-
-  main {
-    /* Optional: Side-by-side layout on larger screens */
-    /* flex-direction: row;
-           align-items: flex-start; */
-  }
-
-  #song-library {
-    /* Optional: Give library a max width if side-by-side */
-    /* flex-basis: 50%; */
-  }
-
-  #audio-player {
-    /* Optional: Adjust player layout if side-by-side */
-    /* flex-basis: 50%; */
-  }
-
-  #player-controls .controls {
-    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
-  }
+#song-list li.active-song .download-button:hover {
+    color: white;
 }

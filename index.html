@@ -4,60 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Project Sanctuary - Private Vault</title>
-    <meta name="description" content="A private digital vault for personal audio collection.">
+    <title>My Sanctuary | Private Collection</title>
+    <meta name="description" content="A private digital vault for my personal audio collection.">
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <!-- Your Stylesheet -->
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- Your Scripts -->
     <script src="js/songs.js" defer></script>
     <script src="js/auth.js" defer></script>
     <script src="js/player.js" defer></script>
 </head>
 <body>
 
-    <div id="password-gate">
-        <div class="gate-content">
-            <h2>Enter Access Code</h2>
-            <input type="password" id="password-input" placeholder="Password">
-            <button id="submit-password">Enter</button>
+    <div class="background-animation"></div>
+
+    <!-- ===== PASSWORD GATE ===== -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>Sanctuary</h1>
+            <p>Enter Access Code</p>
+            <input type="password" id="password-input" placeholder="••••••••">
+            <button id="submit-password">Unlock</button>
             <p id="error-message" class="error"></p>
         </div>
     </div>
 
-    <div id="main-content" style="display: none;">
+    <!-- ===== MAIN APPLICATION ===== -->
+    <div id="app-container">
 
-        <header>
-            <h1>My Sanctuary</h1>
-            <p>Private Song Collection</p>
-        </header>
-
-        <main>
-            <section id="song-library">
+        <!-- Left Panel: Playlist -->
+        <aside id="playlist-panel">
+            <div class="playlist-header">
                 <h2>Library</h2>
-                <ul id="song-list">
-                    </ul>
-            </section>
+                <p>Your private collection</p>
+            </div>
+            <ul id="song-list">
+                <!-- Song items will be dynamically inserted here by player.js -->
+            </ul>
+        </aside>
 
-            <section id="audio-player">
-                <h2>Now Playing</h2>
-                <div id="player-controls">
-                    <audio id="audio-element"></audio> <div id="track-info">
-                        <span id="current-track-title">No track selected</span>
-                    </div>
-                    <div class="controls">
-                        <button id="play-pause-button" aria-label="Play/Pause">▶️</button>
-                        <span id="current-time">0:00</span>
-                        <input type="range" id="progress-bar" value="0" step="0.1" aria-label="Playback progress">
-                        <span id="duration">0:00</span>
-                        <input type="range" id="volume-control" min="0" max="1" step="0.05" value="1" aria-label="Volume control">
-                    </div>
+        <!-- Right Panel: Music Player -->
+        <main id="player-panel">
+            <div class="album-art-container">
+                <img src="img/placeholder-art.jpg" alt="Album Art" id="album-art">
+                <div class="album-art-shadow"></div>
+            </div>
+
+            <div class="track-info">
+                <h2 id="current-track-title">No Track Playing</h2>
+                <p id="current-track-artist">Select a song from the library</p>
+            </div>
+
+            <div class="timeline-container">
+                <input type="range" id="progress-bar" value="0" step="0.1" class="slider" aria-label="Song progress">
+                <div class="time-stamps">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
                 </div>
-            </section>
+            </div>
+
+            <audio id="audio-element"></audio>
+            
+            <div class="player-controls">
+                <button id="prev-button" class="control-btn" aria-label="Previous Song"><i class="fas fa-step-backward"></i></button>
+                <button id="play-pause-button" class="control-btn play" aria-label="Play/Pause"><i class="fas fa-play"></i></button>
+                <button id="next-button" class="control-btn" aria-label="Next Song"><i class="fas fa-step-forward"></i></button>
+            </div>
+            
+            <div class="volume-container">
+                <i class="fas fa-volume-down" aria-hidden="true"></i> <!-- Add aria-hidden to decorative icons -->
+                <input type="range" id="volume-control" min="0" max="1" step="0.05" value="0.8" class="slider" aria-label="Volume control">
+                <i class="fas fa-volume-up" aria-hidden="true"></i> <!-- Add aria-hidden to decorative icons -->
+            </div>
+
         </main>
+    </div>
 
-        <footer>
-            <p>&copy; SkyMusic - All Rights Reserved</p>
-        </footer>
-
-    </div> </body>
+</body>
 </html>
