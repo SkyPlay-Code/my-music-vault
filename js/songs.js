@@ -35,6 +35,13 @@ const playlists = {
             cover: "images/Under the Night Sky (Reprise).png",
             // lyrics: "lyrics/Under the Night Sky (Reprise).txt"
         },
+        {
+            title: "Forever Glow - Short",
+            artist: "SkyMusic",
+            file: "audio/Forever Glow-Short.mp3",
+            cover: "images/Forever Glow-Short.png",
+            // lyrics: "lyrics/Forever Glow - Short.txt"
+        }
     ],
 
     // A NEW, second playlist for a different password
