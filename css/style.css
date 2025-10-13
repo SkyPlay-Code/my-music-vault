@@ -446,3 +446,47 @@ body {
 #song-list li.active-song .download-button:hover {
     color: white;
 }
+
+/* ===== LYRICS CONTAINER STYLES ===== */
+
+#lyrics-container {
+    width: 100%;
+    max-width: 500px;
+    height: 120px; /* Adjust this height as you like */
+    background: var(--secondary-glass);
+    border-radius: 10px;
+    padding: 15px;
+    overflow-y: auto; /* This makes it scrollable if lyrics are long */
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+#lyrics-display {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.9em;
+    white-space: pre-wrap; /* VERY IMPORTANT: This respects the line breaks from your JS string */
+}
+
+/* Style the scrollbar to match the playlist */
+#lyrics-container::-webkit-scrollbar {
+    width: 8px;
+}
+#lyrics-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+#lyrics-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+/* Slight adjustment for mobile to give lyrics more space */
+@media (max-width: 850px) {
+    #player-panel {
+        /* Add some space for the lyrics view on vertical layout */
+        padding-bottom: 30px; 
+    }
+    #lyrics-container {
+        height: 100px; /* A bit smaller on mobile */
+    }
+}
