@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const durationDisplay = document.getElementById('duration');
     const volumeControl = document.getElementById('volume-control');
 
+    // === NEW: MOBILE PLAYLIST TOGGLE REFERENCES ===
+    const togglePlaylistBtn = document.getElementById('toggle-playlist-btn');
+    const playlistOverlay = document.getElementById('playlist-overlay');
+
+
     let currentTrackIndex = -1;
     let songDatabase = []; // We will fill this with the correct playlist later
 
@@ -34,7 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
     }
 
-    // --- Load Song List (this function is now perfect, no changes needed) ---
+    // --- MODIFIED Load Song List ---
+    // Added logic to close the mobile menu after selecting a song.
     function populateSongList() {
         songListElement.innerHTML = '';
         if (!songDatabase || songDatabase.length === 0) return;
@@ -53,7 +59,16 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             
             listItem.querySelector('.download-button').addEventListener('click', (e) => e.stopPropagation());
-            listItem.addEventListener('click', () => { loadTrack(index); playTrack(); });
+            
+            // --- MODIFICATION HERE ---
+            listItem.addEventListener('click', () => {
+                loadTrack(index);
+                playTrack();
+                // Close the playlist on mobile after selection for better UX
+                document.body.classList.remove('playlist-visible');
+            });
+            // --- END MODIFICATION ---
+
             songListElement.appendChild(listItem);
         });
     }
@@ -72,15 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
         trackArtistDisplay.textContent = track.artist;
         albumArt.src = track.cover;
         albumArtShadow.style.backgroundImage = `url('${track.cover}')`;
-        // ===== ADD THIS LOGIC TO UPDATE LYRICS =====
         if (track.lyrics && track.lyrics.trim() !== '') {
             lyricsDisplay.textContent = track.lyrics;
-            lyricsDisplay.parentElement.style.opacity = '1'; // Make container visible
+            lyricsDisplay.parentElement.style.opacity = '1';
         } else {
             lyricsDisplay.textContent = 'No lyrics available for this track.';
-            lyricsDisplay.parentElement.style.opacity = '0.7'; // Fade out if no lyrics
+            lyricsDisplay.parentElement.style.opacity = '0.7';
         }
-        // ===== END OF LYRICS LOGIC =====
         progressBar.value = 0;
         currentTimeDisplay.textContent = '0:00';
     }
@@ -124,40 +137,40 @@ document.addEventListener('DOMContentLoaded', () => {
     volumeControl.addEventListener('input', (e) => { audioElement.volume = e.target.value; });
 
     
-    // --- Main Initialization Logic (THE FIX IS HERE) ---
-    
+    // --- Main Initialization Logic ---
     function initializePlayer() {
         console.log("App container visible, initializing player...");
-
-        // === START OF THE FIX ===
-        // 1. Read the unlocked playlist ID from session storage.
         const unlockedPlaylistId = sessionStorage.getItem('sanctuary_unlocked_playlist');
 
-        // 2. Check if the ID is valid and if a playlist with that name exists.
         if (unlockedPlaylistId && playlists[unlockedPlaylistId]) {
-            // 3. Load the correct song array into our local songDatabase variable.
             songDatabase = playlists[unlockedPlaylistId];
             console.log(`Successfully loaded playlist: ${unlockedPlaylistId}`);
         } else {
             console.error(`Could not find a valid playlist for ID: ${unlockedPlaylistId}`);
-            // songDatabase will remain empty if no valid playlist is found.
         }
-        // === END OF THE FIX ===
 
-        // Now, the rest of the function will work correctly because songDatabase has been filled.
         populateSongList();
-        audioElement.volume = volumeControl.value; // Set initial volume
+        audioElement.volume = volumeControl.value; 
         
         if (songDatabase.length > 0) {
             loadTrack(0);
-            audioElement.load(); // Load metadata for the first track
+            audioElement.load();
         } else {
             trackTitleDisplay.textContent = "Error: Library not found.";
             trackArtistDisplay.textContent = "Please try logging in again.";
         }
     }
+    
+    // === NEW: MOBILE PLAYLIST TOGGLE LOGIC ===
+    if(togglePlaylistBtn && playlistOverlay) {
+        togglePlaylistBtn.addEventListener('click', () => {
+            document.body.classList.toggle('playlist-visible');
+        });
+        playlistOverlay.addEventListener('click', () => {
+            document.body.classList.remove('playlist-visible');
+        });
+    }
 
-    // This part is unchanged and correct
     if (appContainer.classList.contains('visible')) {
         initializePlayer();
     } else {
